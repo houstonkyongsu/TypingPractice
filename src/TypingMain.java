@@ -2,8 +2,6 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.border.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 import java.awt.*;
 
@@ -13,7 +11,7 @@ public class TypingMain extends JPanel {
     private JPanel ui;
     private JTextField input;
     private JLabel errorLabel;
-    private JTextArea textArea;
+    private JTextPane textPane;
     private VocabGenerator vocabGenerator;
     private int errors = 0;
     final static Color ERROR_COL = Color.RED;
@@ -21,25 +19,36 @@ public class TypingMain extends JPanel {
     private int wordIndex;
     private int charIndex;
     private int progress;
+    private int colIndex;
     private ArrayList<String> setText;
 
-    final Highlighter hilit;
-    final Highlighter.HighlightPainter painter;
+    /*
+    TypingMain constructor with no arguments
+     */
+    public TypingMain() {
+        vocabGenerator = new VocabGenerator("dict.csv");
+        initFrame();
+    }
 
     /*
-    TypingMain constructor
+    TypingMain constructor with 1 argument
      */
     public TypingMain(String path) {
         vocabGenerator = new VocabGenerator(path);
+        initFrame();
+    }
+
+    /*
+    function to initialise the frame (and other variables)
+     */
+    public void initFrame() {
         setText = new ArrayList<>();
         wordIndex = 0;
         charIndex = 0;
         progress = 0;
+        colIndex = 0;
         frame = new JFrame("Typing Practice");
         initialiseUI();
-        hilit = new DefaultHighlighter();
-        painter = new DefaultHighlighter.DefaultHighlightPainter(HILIT_COL);
-        textArea.setHighlighter(hilit);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(ui);
         frame.pack();
@@ -56,12 +65,9 @@ public class TypingMain extends JPanel {
         ui.setLayout(new BoxLayout(ui, BoxLayout.PAGE_AXIS));
         ui.setPreferredSize(new Dimension(900, 300));
         errorLabel = new JLabel("Total errors: " + errors);
-        textArea = new JTextArea();
-        textArea.setColumns(50);
-        textArea.setFont(new Font("Serif", Font.PLAIN, 20));
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setEditable(false);
+        textPane = new JTextPane();
+        textPane.setFont(new Font("Serif", Font.PLAIN, 30));
+        textPane.setEditable(false);
 
         JPanel stats = new JPanel();
         stats.setLayout(new BoxLayout(stats, BoxLayout.LINE_AXIS));
@@ -85,7 +91,7 @@ public class TypingMain extends JPanel {
         });
         // add all the panels to the main ui panel
         ui.add(stats);
-        ui.add(textArea);
+        ui.add(textPane);
         ui.add(input);
 
     }
@@ -103,61 +109,87 @@ public class TypingMain extends JPanel {
     }
 
     /*
-    function to generate and display a random sentence
+    function to get the randomly generated sentence and display it in the JTextPane
      */
     private void run() {
+        // reset all the counters
         input.setText("");
         errors = 0;
         wordIndex = 0;
         charIndex = 0;
         progress = 0;
-        setText = vocabGenerator.generateSentence();
+        colIndex = 0;
+        // get array of random words, change the value of max to change the number of words added
+        setText = vocabGenerator.generateSentence(10);
         StringBuilder temp = new StringBuilder();
-        for (String s : setText) {
+        for (String s : setText) { // build the sentence
             temp.append(s).append(" ");
         }
-        textArea.setText(temp.toString());
+        // display the sentence
+        textPane.setText(temp.toString());
+        // next 4 lines from https://stackoverflow.com/questions/3213045/centering-text-in-a-jtextarea-or-jtextpane-horizontal-text-alignment
+        // to centre align the text in the JTextPane
+        StyledDocument doc = textPane.getStyledDocument();
+        SimpleAttributeSet center = new SimpleAttributeSet();
+        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+        doc.setParagraphAttributes(0, doc.getLength(), center, false);
     }
 
     /*
-    function to check the spelling of the word being input
+    function to check the spelling of the word being input, and update the colour of the words
+    in the JTextPane accordingly
      */
     private void checkSpelling(char c) {
         try {
+            StyledDocument doc = textPane.getStyledDocument();
+            Style style = textPane.addStyle("style 1", null);
             String current = setText.get(wordIndex);
             String typed = input.getText();
-            int hindex = textArea.getText().indexOf(current);
+            int hindex = textPane.getText().indexOf(current);
+
             if (current.equals(typed) && c == ' ') { // word completed followed by space
                 if (wordIndex == setText.size() - 1) { // last word in sentence completed
                     run();
                 } else { // mid-sentence word completed
-//                    input.setText("");
                     wordIndex++;
                     charIndex = 0;
                     progress = 0;
+                    colIndex = 0;
                 }
             } else if (current.equals(typed)) { // character typed when should be space
                 errors++;
                 charIndex++;
                 errorLabel.setText("Total errors: " + errors);
             } else { // word still being typed
-                if (charIndex == progress && progress < current.length() - 1) {
+                if (charIndex == progress && progress < current.length()) {
                     if (c == current.charAt(progress)) { // when correct letter typed
-                        hindex += progress;
-                        hilit.addHighlight(hindex, hindex+1, painter);
+                        if (colIndex == progress) { // if current letter has not yet been coloured
+                            hindex += progress;
+                            StyleConstants.setForeground(style, HILIT_COL);
+                            doc.remove(hindex, 1);
+                            doc.insertString(hindex, Character.toString(current.charAt(progress)), style);
+                            colIndex++;
+                        }
                         charIndex++;
                         progress++;
                     } else { // wrong letter typed
+                        hindex += progress;
                         errors++;
                         charIndex++;
+                        if (colIndex == progress) { // if current letter has not yet been coloured
+                            StyleConstants.setForeground(style, ERROR_COL);
+                            doc.remove(hindex, 1);
+                            doc.insertString(hindex, Character.toString(current.charAt(progress)), style);
+                            colIndex++;
+                        }
                         errorLabel.setText("Total errors: " + errors);
                     }
                 } else { // wrong letter already been typed
                     charIndex++;
                 }
             }
-        } catch (BadLocationException e) {
-            System.out.println("BadLocationException caught: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Exception caught: " + e.getMessage());
         }
 
     }
@@ -166,7 +198,15 @@ public class TypingMain extends JPanel {
     main method accepts one command line argument
      */
     public static void main(String[] args) {
-        if (args.length == 1) {
+        if (args.length == 0) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    TypingMain main = new TypingMain();
+                    main.run();
+                }
+            });
+        } else if (args.length == 1) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -175,7 +215,7 @@ public class TypingMain extends JPanel {
                 }
             });
         } else {
-            System.out.println("please provide path to dictionary file");
+            System.out.println("please provide path to dictionary file as an argument, or move dictionary file to default location");
         }
     }
 

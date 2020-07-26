@@ -40,11 +40,11 @@ public class VocabGenerator {
     function to build a string using randomly selected words from the provided list
     with no repeated words
      */
-    public ArrayList<String> generateSentence() {
+    public ArrayList<String> generateSentence(int max) {
         ArrayList<String> res = new ArrayList<>();
         temp.addAll(dict);
         Random random = new Random();
-        while (res.size() < 10) { // keep adding random words until there are 10 words in the list
+        while (res.size() < max) { // add 'max' words to the list
             int i = random.nextInt(temp.size());
             res.add(temp.get(i));
             temp.remove(i);
