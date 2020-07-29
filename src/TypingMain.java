@@ -19,6 +19,7 @@ public class TypingMain extends JPanel {
     private String accuracy = "0";
     final static Color ERROR_COL = Color.RED;
     final static Color HILIT_COL = Color.GREEN;
+    final static Color DEFAULT_COL = Color.BLACK;
     private int wordIndex;
     private int charIndex;
     private int progress;
@@ -74,9 +75,10 @@ public class TypingMain extends JPanel {
         ui.setPreferredSize(new Dimension(900, 300));
         JPanel spanel = new JPanel();
         stats = new JLabel("Total errors: " + errors + " WPM: " + wpm + " Accuracy: " + accuracy);
+        stats.setFont(new Font("Serif", Font.PLAIN, 30));
         spanel.add(stats);
         textPane = new JTextPane();
-        textPane.setFont(new Font("Serif", Font.PLAIN, 30));
+        textPane.setFont(new Font("Serif", Font.PLAIN, 40));
         textPane.setEditable(false);
 
         input = new JTextField();
@@ -116,12 +118,12 @@ public class TypingMain extends JPanel {
     private void determineAction(KeyEvent e) {
         // for debugging
         System.out.println("charIndex: " + charIndex + ", wordIndex: " + wordIndex + ", progress: " + progress + ", colIndex: " + colIndex);
-        if (e.getKeyChar() == '\b' && charIndex > 0) {
+        if (e.getKeyChar() == '\b' && charIndex > 0) { // when backspace is pressed, decrease charIndex if above 0
             charIndex--;
-        } else if (e.getKeyChar() == '\b' && charIndex == 0) {
+        } else if (e.getKeyChar() == '\b' && charIndex == 0) { // when  backspace is pressed but charIndex is already 0
             // do nothing
-        } else if (e.getID() == KeyEvent.KEY_TYPED) {
-            if (!isTyping) {
+        } else if (e.getID() == KeyEvent.KEY_TYPED) { // when another key is pressed
+            if (!isTyping) { // start timing when user starts typing
                 startTime = System.currentTimeMillis();
                 isTyping = true;
             }
@@ -150,29 +152,37 @@ public class TypingMain extends JPanel {
     function to get the randomly generated sentence and display it in the JTextPane
      */
     private void run() {
-        // reset all the counters
-        input.setText("");
-        errors = 0;
-        updateStatsLabel();
-        wordIndex = 0;
-        charIndex = 0;
-        progress = 0;
-        colIndex = 0;
-        isTyping = false;
-        // get array of random words, change the value of max to change the number of words added
-        setText = vocabGenerator.generateSentence(numWords);
-        StringBuilder temp = new StringBuilder();
-        for (String s : setText) { // build the sentence
-            temp.append(s).append(" ");
+        try {
+            // reset all the counters
+            input.setText("");
+            errors = 0;
+            updateStatsLabel();
+            wordIndex = 0;
+            charIndex = 0;
+            progress = 0;
+            colIndex = 0;
+            isTyping = false;
+            // get array of random words, change the value of max to change the number of words added
+            setText = vocabGenerator.generateSentence(numWords);
+            StringBuilder temp = new StringBuilder();
+            for (String s : setText) { // build the sentence
+                temp.append(s).append(" ");
+            }
+            // display the sentence
+            StyledDocument doc = textPane.getStyledDocument();
+            Style style = textPane.addStyle("style 2", null);
+            StyleConstants.setForeground(style, DEFAULT_COL);
+            doc.remove(0, textPane.getText().length());
+            doc.insertString(0, temp.toString(), style);
+
+            // next 4 lines from https://stackoverflow.com/questions/3213045/centering-text-in-a-jtextarea-or-jtextpane-horizontal-text-alignment
+            // to centre align the text in the JTextPane
+            SimpleAttributeSet center = new SimpleAttributeSet();
+            StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+            doc.setParagraphAttributes(0, doc.getLength(), center, false);
+        } catch (BadLocationException e) {
+            System.out.println("Exception caught: " + e.getMessage());
         }
-        // display the sentence
-        textPane.setText(temp.toString());
-        // next 4 lines from https://stackoverflow.com/questions/3213045/centering-text-in-a-jtextarea-or-jtextpane-horizontal-text-alignment
-        // to centre align the text in the JTextPane
-        StyledDocument doc = textPane.getStyledDocument();
-        SimpleAttributeSet center = new SimpleAttributeSet();
-        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-        doc.setParagraphAttributes(0, doc.getLength(), center, false);
     }
 
     /*
@@ -229,7 +239,7 @@ public class TypingMain extends JPanel {
                     charIndex++;
                 }
             }
-        } catch (Exception e) {
+        } catch (BadLocationException e) {
             System.out.println("Exception caught: " + e.getMessage());
         }
 
@@ -240,25 +250,14 @@ public class TypingMain extends JPanel {
      */
     public static void main(String[] args) {
         if (args.length == 0) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    TypingMain main = new TypingMain();
-                    main.run();
-                }
-            });
+            TypingMain main = new TypingMain();
+            main.run();
         } else if (args.length == 1) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    TypingMain main = new TypingMain(args[0]);
-                    main.run();
-                }
-            });
+            TypingMain main = new TypingMain(args[0]);
+            main.run();
         } else {
             System.out.println("please provide path to dictionary file as an argument, or move dictionary file to default location");
         }
     }
-
 
 }

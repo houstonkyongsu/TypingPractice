@@ -3,14 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="4f3a58fa-cbce-4e45-9e69-6472a7419100" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dict.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dict.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TypingPractice/TypingMain$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TypingPractice/TypingMain$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TypingPractice/TypingMain$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TypingPractice/TypingMain$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TypingPractice/TypingMain$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TypingPractice/TypingMain$3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TypingPractice/TypingMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TypingPractice/TypingMain.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TypingPractice/VocabGenerator.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TypingPractice/VocabGenerator.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/TypingMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TypingMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/VocabGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/VocabGenerator.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,29 +72,29 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1595793093900">
+    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1596048191953">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1595793093900" />
+    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1596048191953" />
     <state x="574" y="123" key="#com.intellij.ide.util.MemberChooser" timestamp="1595248000396">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="574" y="123" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1595248000396" />
-    <state width="1493" height="113" key="GridCell.Tab.0.bottom" timestamp="1596037895576">
+    <state width="1493" height="113" key="GridCell.Tab.0.bottom" timestamp="1596049413865">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="113" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1596037895576" />
-    <state width="1493" height="113" key="GridCell.Tab.0.center" timestamp="1596037895576">
+    <state width="1493" height="113" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1596049413865" />
+    <state width="1493" height="113" key="GridCell.Tab.0.center" timestamp="1596049413865">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="113" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1596037895576" />
-    <state width="1493" height="113" key="GridCell.Tab.0.left" timestamp="1596037895576">
+    <state width="1493" height="113" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1596049413865" />
+    <state width="1493" height="113" key="GridCell.Tab.0.left" timestamp="1596049413865">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="113" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1596037895576" />
-    <state width="1493" height="113" key="GridCell.Tab.0.right" timestamp="1596037895576">
+    <state width="1493" height="113" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1596049413865" />
+    <state width="1493" height="113" key="GridCell.Tab.0.right" timestamp="1596049413865">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="113" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1596037895576" />
+    <state width="1493" height="113" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1596049413865" />
   </component>
 </project>
