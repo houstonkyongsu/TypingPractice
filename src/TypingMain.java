@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.event.*;
+import java.text.DecimalFormat;
 import java.util.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
@@ -10,10 +11,12 @@ public class TypingMain extends JPanel {
     private JFrame frame;
     private JPanel ui;
     private JTextField input;
-    private JLabel errorLabel;
+    private JLabel stats;
     private JTextPane textPane;
     private VocabGenerator vocabGenerator;
     private int errors = 0;
+    private String wpm = "0";
+    private String accuracy = "0";
     final static Color ERROR_COL = Color.RED;
     final static Color HILIT_COL = Color.GREEN;
     private int wordIndex;
@@ -21,6 +24,10 @@ public class TypingMain extends JPanel {
     private int progress;
     private int colIndex;
     private ArrayList<String> setText;
+    private int numWords = 10;
+    private boolean isTyping;
+    private long startTime = 0;
+    private long endTime = 0;
 
     /*
     TypingMain constructor with no arguments
@@ -54,6 +61,7 @@ public class TypingMain extends JPanel {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        isTyping = false;
     }
 
     /*
@@ -64,14 +72,13 @@ public class TypingMain extends JPanel {
         ui.setBorder(new EmptyBorder(5, 5, 5, 5));
         ui.setLayout(new BoxLayout(ui, BoxLayout.PAGE_AXIS));
         ui.setPreferredSize(new Dimension(900, 300));
-        errorLabel = new JLabel("Total errors: " + errors);
+        JPanel spanel = new JPanel();
+        stats = new JLabel("Total errors: " + errors + " WPM: " + wpm + " Accuracy: " + accuracy);
+        spanel.add(stats);
         textPane = new JTextPane();
         textPane.setFont(new Font("Serif", Font.PLAIN, 30));
         textPane.setEditable(false);
 
-        JPanel stats = new JPanel();
-        stats.setLayout(new BoxLayout(stats, BoxLayout.LINE_AXIS));
-        stats.add(errorLabel);
         input = new JTextField();
         input.addKeyListener(new KeyListener() {
             @Override
@@ -90,22 +97,53 @@ public class TypingMain extends JPanel {
             }
         });
         // add all the panels to the main ui panel
-        ui.add(stats);
+        ui.add(spanel);
         ui.add(textPane);
         ui.add(input);
 
     }
 
     /*
+    function to update the stats label
+     */
+    private void updateStatsLabel() {
+        stats.setText("Total errors: " + errors + "   WPM: " + wpm + "   Accuracy: " + accuracy + "%");
+    }
+
+    /*
     function to determine what type of KeyEvent occurred
      */
     private void determineAction(KeyEvent e) {
+        // for debugging
+        System.out.println("charIndex: " + charIndex + ", wordIndex: " + wordIndex + ", progress: " + progress + ", colIndex: " + colIndex);
         if (e.getKeyChar() == '\b' && charIndex > 0) {
             charIndex--;
+        } else if (e.getKeyChar() == '\b' && charIndex == 0) {
+            // do nothing
         } else if (e.getID() == KeyEvent.KEY_TYPED) {
+            if (!isTyping) {
+                startTime = System.currentTimeMillis();
+                isTyping = true;
+            }
             char c = e.getKeyChar();
             checkSpelling(c);
         }
+    }
+
+    /*
+    function to calculate the wpm and accuracy statistics when a set of words is completed
+     */
+    private void calculateStats() {
+        endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        elapsed = elapsed / 1000;
+        DecimalFormat df = new DecimalFormat("###.###");
+        wpm = df.format(numWords / (elapsed / 60.0));
+        float chars = 0;
+        for (String s : setText) {
+            chars += s.length() + 1;
+        }
+        accuracy = df.format(((chars - errors) / chars) * 100);
     }
 
     /*
@@ -115,12 +153,14 @@ public class TypingMain extends JPanel {
         // reset all the counters
         input.setText("");
         errors = 0;
+        updateStatsLabel();
         wordIndex = 0;
         charIndex = 0;
         progress = 0;
         colIndex = 0;
+        isTyping = false;
         // get array of random words, change the value of max to change the number of words added
-        setText = vocabGenerator.generateSentence(10);
+        setText = vocabGenerator.generateSentence(numWords);
         StringBuilder temp = new StringBuilder();
         for (String s : setText) { // build the sentence
             temp.append(s).append(" ");
@@ -145,10 +185,11 @@ public class TypingMain extends JPanel {
             Style style = textPane.addStyle("style 1", null);
             String current = setText.get(wordIndex);
             String typed = input.getText();
-            int hindex = textPane.getText().indexOf(current);
+            int hindex = textPane.getText().indexOf(current + " ");
 
             if (current.equals(typed) && c == ' ') { // word completed followed by space
                 if (wordIndex == setText.size() - 1) { // last word in sentence completed
+                    calculateStats();
                     run();
                 } else { // mid-sentence word completed
                     wordIndex++;
@@ -159,9 +200,9 @@ public class TypingMain extends JPanel {
             } else if (current.equals(typed)) { // character typed when should be space
                 errors++;
                 charIndex++;
-                errorLabel.setText("Total errors: " + errors);
+                updateStatsLabel();
             } else { // word still being typed
-                if (charIndex == progress && progress < current.length()) {
+                if (charIndex == progress && progress <= current.length()) {
                     if (c == current.charAt(progress)) { // when correct letter typed
                         if (colIndex == progress) { // if current letter has not yet been coloured
                             hindex += progress;
@@ -182,7 +223,7 @@ public class TypingMain extends JPanel {
                             doc.insertString(hindex, Character.toString(current.charAt(progress)), style);
                             colIndex++;
                         }
-                        errorLabel.setText("Total errors: " + errors);
+                        updateStatsLabel();
                     }
                 } else { // wrong letter already been typed
                     charIndex++;

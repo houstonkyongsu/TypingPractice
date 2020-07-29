@@ -42,6 +42,7 @@ public class VocabGenerator {
      */
     public ArrayList<String> generateSentence(int max) {
         ArrayList<String> res = new ArrayList<>();
+        temp.clear();
         temp.addAll(dict);
         Random random = new Random();
         while (res.size() < max) { // add 'max' words to the list
